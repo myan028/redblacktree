@@ -18,5 +18,6 @@ class Node{
 		Node* right;
 		Node* parent;
 		int data;
+		int color;
 };
 #endif

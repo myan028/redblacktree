@@ -5,7 +5,8 @@ Node::Node(){
 	left = NULL;
 	right = NULL;
 	parent = NULL;
-	data;
+	data = 0;
+	color = 0; //0 is black, 1 is red
 }
 
 
@@ -30,6 +31,16 @@ int Node::getData(){
 
 void Node::setData(int newData){
 	data = newData;
+}
+
+
+
+void Node::getColor(){
+	return color;
+}
+
+void Node::setColor(int newColor){
+	color = newColor;
 }
 
 
