@@ -8,10 +8,12 @@ class Node{
 		Node* getLeft();
 		Node* getParent();
 		int getData();
+		int getColor();
 		void setData(int);
 		void setLeft(Node*);
 		void setRight(Node*);
 		void setParent(Node*);
+		void setColor(int);
 		~Node();
 	private:
 		Node* left;

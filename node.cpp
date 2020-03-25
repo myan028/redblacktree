@@ -35,7 +35,7 @@ void Node::setData(int newData){
 
 
 
-void Node::getColor(){
+int Node::getColor(){
 	return color;
 }
 
