@@ -12,37 +12,51 @@ Code by Michael Yan
 This code creates a Red Black Tree, able to add, search, and print (delete later)
 */
 
+void addNode(Node*, Node*, int);
+void printTree(Node*, int);
+void fixTree(Node*, Node*);
+void rotateTree(Node*, Node*, int);
+
+
 using namespace std;
 
 
-void addNode(Node** head, Node* parentNode, int number){ //insert pseudo: https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
-	if(parentNode->getData() == 0){
-		parentNode->setColor(1);
-		parentNode->setData(number);
+Node* head = new Node; //root
+
+
+void addNode(Node* head, Node* parent, int input){ //insert pseudo: https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
+	if(head->getData() == NULL){
+		//cout << "yuh";
+		//head = parent;
+		parent->setColor(1);
+		parent->setData(input);
 	}
 	else{
-		if(number < parentNode->getData()){
-			if (parentNode->getLeft() == NULL){
-				Node* newNode = new Node();
-				newNode->setData(number);
-				newNode->setParent(parentNode);
-				parentNode->setLeft(newNode);
-				//call the fixTree function
+		if(input < parent->getData()){ //if the input is less than previous
+			if(parent->getLeft() == NULL){ //if no left child
+				Node* tempNode = new Node();
+				tempNode->setData(input);
+				tempNode->setParent(parent);
+				parent->setLeft(tempNode);
+				cout << "fixtree input less than parent. ";
+				fixTree(head, tempNode); //rotate
 			}
 			else{
-				addNode(head, parentNode->getLeft(), number);
+				addNode(head, parent->getLeft(), input); //call recursively to the left until no left child
 			}
 		}
-		else{
-			if(parentNode->getRight() == NULL){
-				Node* newNode = new Node();
-				newNode->setData(number);
-				newNode->setParent(parentNode);
-				parentNode->setRight(newNode);
-				//fixTree
+		else{ //if the input is greater than or equal to the previous
+			cout << "here. ";
+			if(parent->getRight() == NULL){ //if no right child
+				Node* tempNode = new Node();
+				tempNode->setData(input);
+				tempNode->setParent(parent);
+				parent->setRight(tempNode);
+				cout << "fixtree input greater or equal to parent. ";
+				fixTree(head, tempNode); //rotate
 			}
 			else{
-				addNode(head, parentNode->getRight(), number);
+				addNode(head, parent->getRight(), input); //call recursively to the right until no right child
 			}
 		}
 	}
@@ -50,63 +64,76 @@ void addNode(Node** head, Node* parentNode, int number){ //insert pseudo: https:
 
 
 
-void printTree(Node* parentNode, int count){
-	if(parentNode->getRight() != NULL){
-		print(parentNode->getRight(), count+1);
+void printTree(Node* parent, int space){ //sideways tree print algorithm (same as bst)
+	
+	if(head == NULL){ //dont print an empty tree
+		cout << "(tree is empty)" << endl;
+		return;
 	}
-	int n = count; //temporary variable
-	while(count > 0){
+	
+	if(parent->getRight() != NULL){
+		printTree(parent->getRight(), space+1);
+	}
+	
+	int n = space; //count variable
+	
+	
+	while(space > 0){ //print spaces
 		cout << "	";
-		count--;
+		space--;
 	}
-	if(parentNode->getColor() == 1){ //black
-		cout << "\033[4;35m" << parentNode->getData() << "\033[0m" << endl;
+	
+	
+	if(parent->getColor() == 0){ //red
+		cout << "\033[1;31m" << parent->getData() << "\033[0m" << endl; //print red
 	}
-	else{ //red
-		cout << "\033[4;31m" << parentNode->getData() << "\033[0m" << endl;
+	else if(parent->getColor() == 1){ //black
+		cout << "\033[1;34m" << parent->getData() << "\033[0m" << endl; //print black (more like blue)
 	}
-	if(parentNode->getLeft() != NULL){
-		printTree(parentNode->getLeft(), n+1);
+	
+	if(parent->getLeft() != NULL){
+		printTree(parent->getLeft(), n+1);
 	}
+	
 }
 
 
 
-void fixTree(Node** head, Node* newNode){ //check and fix tree after every insertion
+void fixTree(Node* head, Node* current){ //check and fix tree after every insertion
 	
-	Node* parent = NULL;
-	Node* grandparent = NULL;
+	//Node* parent = NULL;
+	//Node* grandparent = NULL;
+	Node* parent = current->getParent(); //declare parent
+	Node* grandparent = parent->getParent(); //declare grandparent
 	
-	
-	while(newNode->getParent() != NULL && newNode->getParent()->getColor() == 0 && newNode != *head){
+	//if current is the root, do nothing
+	while(current != head && parent != NULL && parent->getColor() == 0){
 		
-		parent = newNode->getParent();
-		grandparent = parent->getParent();//not needed
+		//Node* parent = current->getParent(); //declare parent
+		//Node* grandparent = parent->getParent(); //declare grandparent
 		
-		if(newNode->getParent() == newNode->getParent()->getParent()->getLeft()){ //if parent is left child
-			Node* uncle = newNode()->getParent()->getParent()->getRight();
+		if(parent == grandparent->getLeft()){ //if parent is left child
+			Node* uncle = grandparent->getRight();
 			
 			if(uncle != NULL && uncle->getColor() == 0){ //if uncle is red
-				newNode->getParent()->setColor(1);
+				parent->setColor(1);
 				uncle->setColor(1);
-				newNode->getParent()->getParent()->setColor(0); //grand parent is red
-				newNode = newNode->getParent()->getParent();
+				grandparent->setColor(0); //grand parent is red
+				current = grandparent;
 			}
 			
 			else{ //if uncle is black
-				if(newNode == newNode->getParent()->getRight()){
-					newNode = newNode->getParent();
-					//do a left rotation
-					//newNode = parent
-					//parent = newNode->getParent(); //parents
+				if(current == parent->getRight()){
+					current = parent;
+					rotateTree(head, current, 0);
+					//current = parent
+					//parent = current->getParent(); //parents
 				}
-				//newNode is left child
-				//do a right rotation
+				parent->setColor(1);
+				grandparent->setColor(0);
+				rotateTree(head, grandparent, 1);
 			}
 		}
-		
-		
-		
 		
 		else{ //if parent is right childe
 			
@@ -114,50 +141,77 @@ void fixTree(Node** head, Node* newNode){ //check and fix tree after every inser
 			
 			//same as parent left child
 			if(uncle != NULL && uncle->getColor() == 0){ //if uncle is red
-				node* input = new node();
-				input = newNode()->getParent()->getParent()->getLeft();
-				newNode->getParent()->setColor(1);
+				Node* input = new Node();
+				input = current->getParent()->getParent()->getLeft();
+				current->getParent()->setColor(1);
 				input->setColor(1);
-				newNode->getParent()->getParent()->setColor(0);
-				newNode = newNode->getParent()->getParent();
+				current->getParent()->getParent()->setColor(0);
+				current = current->getParent()->getParent();
 			}
 			else{
-				if(newNode == newNode->getParent()->getLeft()){
-					newNode = newNode->getParent();
-					//do a right rotation
+				if(current == parent->getLeft()){
+					current = parent;
+					rotateTree(head, current, 1);
 				}
-				newNode->getParent()->setColor(1);
-				newNode->getParent()->getParent()->setColor(0);
-				//left rotation, but with the parent of parent of newNode
+				parent->setColor(1);
+				grandparent->setColor(0);
+				rotateTree(head, grandparent, 0);
 			}
 		}
 		
 	}
-	*head->setColor(2);
 }
 
 
 
 
-void rotateTree(Node** head, Node* nextNode, int leftright){
+
+
+
+void rotateTree(Node* head, Node* nextNode, int leftright){
 	
 	//0 is left, 1 is right
 	if(leftright = 0){ //left rotation
-		//set current to nextNode right
-		//set nextNode right to current's left
-		// if current left is not null, 
-			//set current left's parent to nextNode
-		//set current's parent to nextNode's parent
-		// if nextNode is the head of tree,
-			//set head to current
-		// else	
-			//if nextNode is a left child, set to current node
-			//else set nextNode's parent's right child to current node
-		//set current's left to nextNode
-		//set nextNode parent to current
+		Node* current = nextNode->getRight();
+		nextNode->setRight(current->getLeft());
+		if(current->getLeft() != NULL){
+			current->getLeft()->setParent(nextNode);
+		}
+		current->setParent(nextNode->getParent());
+		if(nextNode == head){
+			head = current;
+		}
+		else{
+			if(nextNode == nextNode->getParent()->getLeft()){
+				nextNode->getParent()->setLeft(current);
+			}
+			else{
+				nextNode->getParent()->setRight(current);
+			}
+		}
+		current->setLeft(nextNode);
+		nextNode->setParent(current);
 	}
 	if(leftright = 1){ //right rotation
-		//same, but left and rights are swapped
+		Node* current = nextNode->getLeft();
+		nextNode->setLeft(current->getRight());
+		if(current->getRight() != NULL){
+			current->getRight()->setParent(nextNode);
+		}
+		current->setParent(nextNode->getParent());
+		if(nextNode == head){
+			head = current;
+		}
+		else{
+			if(nextNode == nextNode->getParent()->getLeft()){
+				nextNode->getParent()->setLeft(current);
+			}
+			else{
+				nextNode->getParent()->setRight(current);
+			}
+		}
+		current->setRight(nextNode);
+		nextNode->setParent(current);
 	}
 }
 
@@ -184,7 +238,7 @@ int main(){
 	int *stor = new int[1000];
 	
 	
-	Node* head = new Node(); //root
+	//Node* head = new Node(); //root
 	
 	
 	while(true){ //give user action command options
@@ -192,16 +246,16 @@ int main(){
 		
 		char* command = new char[10];
 		cin.getline(command, 10);
-		int number = 0;
+		int number = 0;	
 		
 		if(strcmp(command, "add") == 0){ //add numbers in console
-			cout << "Enter the number you want to add: " <<endl;
+			cout << "Enter the number you want to add: " << endl;
 			cin >> number;
 			cin.get();
-			addNode(&head, head, number);
+			addNode(head, head, number);
 		}
 		
-		else if(strcmp(command, "read") == 0){
+		/*else if(strcmp(command, "read") == 0){
 			cout << "Type the file name (include the .txt extension): ";
 			char* filename = new char[100];
 			cin.getline(filename, 100);
@@ -221,9 +275,10 @@ int main(){
 				//if(stor[i] == ')
 				//addNode(head, stor[i]);
 			}
-		}
+		}*/
 		
 		else if(strcmp(command, "print") == 0){ //print rbt
+			printTree(head, 0);
 		}
 		
 		else if(strcmp(command, "quit") == 0){ //if user wants to quit program
