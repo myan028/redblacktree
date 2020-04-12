@@ -38,7 +38,7 @@ void addNode(Node* head, Node* parent, int input){ //insert pseudo: https://en.w
 				tempNode->setData(input);
 				tempNode->setParent(parent);
 				parent->setLeft(tempNode);
-				cout << "fixtree input less than parent. ";
+				//cout << "fixtree input less than parent. ";
 				fixTree(head, tempNode); //rotate
 			}
 			else{
@@ -46,13 +46,13 @@ void addNode(Node* head, Node* parent, int input){ //insert pseudo: https://en.w
 			}
 		}
 		else{ //if the input is greater than or equal to the previous
-			cout << "here. ";
+			//cout << "here. ";
 			if(parent->getRight() == NULL){ //if no right child
 				Node* tempNode = new Node();
 				tempNode->setData(input);
 				tempNode->setParent(parent);
 				parent->setRight(tempNode);
-				cout << "fixtree input greater or equal to parent. ";
+				//cout << "fixtree input greater or equal to parent. ";
 				fixTree(head, tempNode); //rotate
 			}
 			else{
@@ -60,6 +60,8 @@ void addNode(Node* head, Node* parent, int input){ //insert pseudo: https://en.w
 			}
 		}
 	}
+	//	head->setColor(0);
+	
 }
 
 
@@ -123,16 +125,25 @@ void fixTree(Node* head, Node* current){ //check and fix tree after every insert
 			}
 			
 			else{ //if uncle is black
-				if(current == parent->getRight()){
+				if(current == parent->getRight()){ //if current is right child
+					cout << "rotate tree left" << endl;
+					rotateTree(head, current, 0);	//SEGFAULT
 					current = parent;
-					rotateTree(head, current, 0);
-					//current = parent
-					//parent = current->getParent(); //parents
+					parent = current->getParent(); //parents
 				}
-				parent->setColor(1);
-				grandparent->setColor(0);
-				rotateTree(head, grandparent, 1);
+				//current is left child
+				cout << "rotate tree right grandparent" << endl;
+				rotateTree(head, grandparent, 1); //SEGFAULT
+				int tempColor = parent->getColor();
+				//parent->setColor(1);
+				//grandparent->setColor(0);
+				parent->setColor(grandparent->getColor());
+				grandparent->setColor(tempColor);
+				
+				current = parent;
 			}
+			//uncle = NULL;
+			//delete uncle; //mem
 		}
 		
 		else{ //if parent is right childe
@@ -141,25 +152,44 @@ void fixTree(Node* head, Node* current){ //check and fix tree after every insert
 			
 			//same as parent left child
 			if(uncle != NULL && uncle->getColor() == 0){ //if uncle is red
-				Node* input = new Node();
-				input = current->getParent()->getParent()->getLeft();
-				current->getParent()->setColor(1);
-				input->setColor(1);
-				current->getParent()->getParent()->setColor(0);
-				current = current->getParent()->getParent();
-			}
-			else{
-				if(current == parent->getLeft()){
-					current = parent;
-					rotateTree(head, current, 1);
-				}
+				//Node* input = new Node();
+				//input = uncle;
+				
 				parent->setColor(1);
-				grandparent->setColor(0);
-				rotateTree(head, grandparent, 0);
+				//input->setColor(1);
+				uncle->setColor(1);
+				grandparent->setColor(0); //grand parent red
+				current = grandparent;
 			}
+			else{ //if uncle is black
+				if(current == parent->getLeft()){ //if current is left child
+					cout << "rotate tree right" << endl;
+					rotateTree(head, current, 1); //SEGFAULT
+					current = parent;
+					//parent = current->getParent;
+				}
+				//current is right child
+				cout << "rotate tree left grandparent" << endl;
+				rotateTree(head, grandparent, 0);	//SEGFAULT
+				int tempColor = parent->getColor();
+				parent->setColor(grandparent->getColor());
+				grandparent->setColor(tempColor);
+			}
+			//uncle = NULL;
+			//delete uncle;
 		}
 		
 	}
+	
+	//cout << "got here" << endl;
+	
+	/*parent = NULL;
+	grandparent = NULL;
+	delete parent;
+	delete grandparent;*/
+	
+	head->setColor(1); //root is always black
+	
 }
 
 
@@ -168,50 +198,71 @@ void fixTree(Node* head, Node* current){ //check and fix tree after every insert
 
 
 
-void rotateTree(Node* head, Node* nextNode, int leftright){
+void rotateTree(Node* head, Node* current, int leftright){ //ISSUE IS IN THE ROTATION FUNCTION
+	
+	//cout << "um hi i should be getting here right.?" << endl;
 	
 	//0 is left, 1 is right
-	if(leftright = 0){ //left rotation
-		Node* current = nextNode->getRight();
-		nextNode->setRight(current->getLeft());
-		if(current->getLeft() != NULL){
-			current->getLeft()->setParent(nextNode);
+	if(leftright == 0){ //left rotation		//SEGFAULT HAPPENS WHEN I TRY TO DO LEFT ROTATE //ERROR: I HAD ONE '=' INSTEAD OF TWO '=='!!!
+		//cout << "did i get here? i did!" << endl;
+		
+		cout << current->getRight() << endl;
+		
+		Node* rightNode = current->getRight();
+		cout << "hey. i actually got here!" << endl;
+		current->setRight(rightNode->getLeft());	//according to xcode, rightNode is NULL???
+		cout << current->getData() << endl;
+		if(rightNode->getLeft() != NULL){
+			rightNode->getLeft()->setParent(current);
 		}
-		current->setParent(nextNode->getParent());
-		if(nextNode == head){
-			head = current;
+		rightNode->setParent(current->getParent());
+		if(current == head){
+			head = rightNode;
 		}
 		else{
-			if(nextNode == nextNode->getParent()->getLeft()){
-				nextNode->getParent()->setLeft(current);
+			if(current == current->getParent()->getLeft()){
+				current->getParent()->setLeft(rightNode);
 			}
 			else{
-				nextNode->getParent()->setRight(current);
+				current->getParent()->setRight(rightNode);
 			}
 		}
-		current->setLeft(nextNode);
-		nextNode->setParent(current);
+		rightNode->setLeft(current);
+		current->setParent(rightNode);
 	}
-	if(leftright = 1){ //right rotation
-		Node* current = nextNode->getLeft();
-		nextNode->setLeft(current->getRight());
-		if(current->getRight() != NULL){
-			current->getRight()->setParent(nextNode);
-		}
-		current->setParent(nextNode->getParent());
-		if(nextNode == head){
-			head = current;
+	
+	
+	
+	if(leftright == 1){ //right rotation
+		Node* leftNode = current->getLeft();
+		
+		cout << current->getLeft() << endl;
+		
+		/*if(current->getRight() == NULL){ //btw if u wanna sue this current became leftNode.
+			
 		}
 		else{
-			if(nextNode == nextNode->getParent()->getLeft()){
-				nextNode->getParent()->setLeft(current);
+			nextNode->setLeft(current->getRight()); //amd mextMpde became current!
+		 }*/
+		
+		current->setLeft(leftNode->getRight());	//SEGFAULT IS THROWN HERE.
+		if(leftNode->getRight() != NULL){
+			leftNode->getRight()->setParent(current);
+		}
+		leftNode->setParent(current->getParent());
+		if(current == head){
+			head = leftNode;
+		}
+		else{
+			if(current == current->getParent()->getLeft()){
+				current->getParent()->setLeft(leftNode);
 			}
 			else{
-				nextNode->getParent()->setRight(current);
+				current->getParent()->setRight(leftNode);
 			}
 		}
-		current->setRight(nextNode);
-		nextNode->setParent(current);
+		leftNode->setRight(current);
+		current->setParent(leftNode);
 	}
 }
 

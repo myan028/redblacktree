@@ -11,6 +11,13 @@ Node::Node(){
 
 
 
+Node::~Node(){
+	left = NULL;
+	right = NULL;
+}
+
+
+
 Node* Node::getRight(){
 	return right;
 }
@@ -56,3 +63,4 @@ void Node::setLeft(Node* newLeft){
 void Node::setParent(Node* newParent){
 	parent = newParent;
 }
+
