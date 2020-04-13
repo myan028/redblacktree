@@ -172,6 +172,7 @@ void fixTree(Node* head, Node* current){ //check and fix tree after every insert
 				//current is right child
 				cout << "rotate tree left grandparent" << endl;
 				rotateTree(head, grandparent, 0);	//SEGFAULT
+				cout << "====================" << endl;
 				printTree(head, 0);
 				int tempColor = parent->getColor();
 				parent->setColor(grandparent->getColor());
@@ -191,6 +192,13 @@ void fixTree(Node* head, Node* current){ //check and fix tree after every insert
 	delete grandparent;*/
 	
 	head->setColor(1); //root is always black
+	cout << "what is the head? it's " << head->getData() << endl;
+	
+	if(head->getParent() != NULL){
+		head = parent;
+	}
+	
+	cout << "what is the head? it's " << head->getData() << endl;
 	
 }
 
@@ -201,8 +209,6 @@ void fixTree(Node* head, Node* current){ //check and fix tree after every insert
 
 
 void rotateTree(Node* head, Node* current, int leftright){ //ISSUE IS IN THE ROTATION FUNCTION
-	
-	//cout << "um hi i should be getting here right.?" << endl;
 	
 	//0 is left, 1 is right
 	if(leftright == 0){ //left rotation		//SEGFAULT HAPPENS WHEN I TRY TO DO LEFT ROTATE //ERROR: I HAD ONE '=' INSTEAD OF TWO '=='!!!
@@ -241,21 +247,16 @@ void rotateTree(Node* head, Node* current, int leftright){ //ISSUE IS IN THE ROT
 		
 		rightNode->setLeft(current);
 		current->setParent(rightNode);
-		//goto gohere;
 		printTree(head, 0);
 		
 	}
+	
+	
+	
 	else if(leftright == 1){ //right rotation
 		Node* leftNode = current->getLeft();
 		
 		cout << current->getLeft()->getData() << endl;
-		
-		/*if(current->getRight() == NULL){ //btw if u wanna sue this current became leftNode.
-			
-		}
-		else{
-			nextNode->setLeft(current->getRight()); //amd mextMpde became current!
-		 }*/
 		
 		current->setLeft(leftNode->getRight());	//SEGFAULT IS THROWN HERE.
 		if(leftNode->getRight() != NULL){
@@ -277,9 +278,6 @@ void rotateTree(Node* head, Node* current, int leftright){ //ISSUE IS IN THE ROT
 		current->setParent(leftNode);
 		printTree(head, 0);
 	}
-	//gohere:
-	
-	//cout << "haha" << endl;
 	
 }
 
