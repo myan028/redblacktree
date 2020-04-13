@@ -127,8 +127,9 @@ void fixTree(Node* head, Node* current){ //check and fix tree after every insert
 			else{ //if uncle is black
 				if(current == parent->getRight()){ //if current is right child
 					cout << "rotate tree left" << endl;
-					rotateTree(head, current, 0);	//SEGFAULT
 					current = parent;
+					cout << "##currentnode is " << current->getData() << endl;
+					rotateTree(head, current, 0);	//SEGFAULT
 					parent = current->getParent(); //parents
 				}
 				//current is left child
@@ -139,7 +140,6 @@ void fixTree(Node* head, Node* current){ //check and fix tree after every insert
 				//grandparent->setColor(0);
 				parent->setColor(grandparent->getColor());
 				grandparent->setColor(tempColor);
-				
 				current = parent;
 			}
 			//uncle = NULL;
@@ -164,13 +164,15 @@ void fixTree(Node* head, Node* current){ //check and fix tree after every insert
 			else{ //if uncle is black
 				if(current == parent->getLeft()){ //if current is left child
 					cout << "rotate tree right" << endl;
+					current = parent; //current is now the PARENT
+					cout << "##currentnode is " << current->getData() << endl;
 					rotateTree(head, current, 1); //SEGFAULT
-					current = parent;
 					//parent = current->getParent;
 				}
 				//current is right child
 				cout << "rotate tree left grandparent" << endl;
 				rotateTree(head, grandparent, 0);	//SEGFAULT
+				printTree(head, 0);
 				int tempColor = parent->getColor();
 				parent->setColor(grandparent->getColor());
 				grandparent->setColor(tempColor);
@@ -206,16 +208,25 @@ void rotateTree(Node* head, Node* current, int leftright){ //ISSUE IS IN THE ROT
 	if(leftright == 0){ //left rotation		//SEGFAULT HAPPENS WHEN I TRY TO DO LEFT ROTATE //ERROR: I HAD ONE '=' INSTEAD OF TWO '=='!!!
 		//cout << "did i get here? i did!" << endl;
 		
-		cout << current->getRight() << endl;
+		cout << "##current's right child is " << current->getRight()->getData() << endl;
 		
-		Node* rightNode = current->getRight();
+		Node* rightNode = current->getRight(); //current's right child
 		cout << "hey. i actually got here!" << endl;
 		current->setRight(rightNode->getLeft());	//according to xcode, rightNode is NULL???
-		cout << current->getData() << endl;
+		
+		//what is rightNode left child???
+		
 		if(rightNode->getLeft() != NULL){
 			rightNode->getLeft()->setParent(current);
 		}
+		
+		//current->setRight(rightNode->getLeft()); //test
+		
 		rightNode->setParent(current->getParent());
+		
+		
+		
+		
 		if(current == head){
 			head = rightNode;
 		}
@@ -227,16 +238,17 @@ void rotateTree(Node* head, Node* current, int leftright){ //ISSUE IS IN THE ROT
 				current->getParent()->setRight(rightNode);
 			}
 		}
+		
 		rightNode->setLeft(current);
 		current->setParent(rightNode);
+		//goto gohere;
+		printTree(head, 0);
+		
 	}
-	
-	
-	
-	if(leftright == 1){ //right rotation
+	else if(leftright == 1){ //right rotation
 		Node* leftNode = current->getLeft();
 		
-		cout << current->getLeft() << endl;
+		cout << current->getLeft()->getData() << endl;
 		
 		/*if(current->getRight() == NULL){ //btw if u wanna sue this current became leftNode.
 			
@@ -257,13 +269,18 @@ void rotateTree(Node* head, Node* current, int leftright){ //ISSUE IS IN THE ROT
 			if(current == current->getParent()->getLeft()){
 				current->getParent()->setLeft(leftNode);
 			}
-			else{
+			else{ //must be right
 				current->getParent()->setRight(leftNode);
 			}
 		}
 		leftNode->setRight(current);
 		current->setParent(leftNode);
+		printTree(head, 0);
 	}
+	//gohere:
+	
+	//cout << "haha" << endl;
+	
 }
 
 
