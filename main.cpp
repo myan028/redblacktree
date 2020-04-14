@@ -103,11 +103,8 @@ void printTree(Node* parent, int space){ //sideways tree print algorithm (same a
  
 Node* fixTree(Node** head, Node* current){ //check and fix tree after every insertion
     
-    //Node* parent = current->getParent(); //declare parent
-    //Node* grandparent = parent->getParent(); //declare grandparent
-    
     //if current is the root, do nothing
-    while(current != *head && current->getParent() != NULL && current->getParent()->getColor() == 0){
+    while(current != *head && current->getParent() != NULL && current->getParent()->getColor() == 0){ //continue fixing tree
         
         Node* parent = current->getParent(); //declare parent
         Node* grandparent = parent->getParent(); //declare grandparent
@@ -121,36 +118,23 @@ Node* fixTree(Node** head, Node* current){ //check and fix tree after every inse
                 uncle->setColor(1);
                 grandparent->setColor(0); //grand parent is red
 				
-                current = grandparent; //this is not wokring for some reason
-				cout << "current is now: " << current->getData() << endl;
+                current = grandparent; //set new current to keep fixing tree
             }
             
             else{ //if uncle is black
                 if(current == parent->getRight()){ //if current is right child
-                    cout << "rotate tree left" << endl;
                     current = parent;
-                    //cout << "##currentnode is " << current->getData() << endl;
-                    //return rotateTree(head, current, 0);
-					rotateTree(head, current, 0);
+					rotateTree(head, current, 0); //rotate left
 					
-					
-					//current = grandparent; //MAYYYYYYYBW
-                    //parent = current->getParent(); //parents
                 }
-				
                 //current is left child
-                cout << "rotate tree right grandparent" << endl;
-                
-				
                 int tempColor = parent->getColor();
                 parent->setColor(grandparent->getColor());
                 grandparent->setColor(tempColor);
 				
-                //current = parent;
+				rotateTree(head, grandparent, 1); //rotate right
 				
-				rotateTree(head, grandparent, 1);
-				
-				return (*(head));
+				//return (*(head));
             }
         }
         
@@ -165,49 +149,28 @@ Node* fixTree(Node** head, Node* current){ //check and fix tree after every inse
                 uncle->setColor(1);
                 grandparent->setColor(0); //grand parent red
 				
-                current = grandparent; //why is this not working
-				cout << "current is now: " << current->getData() << endl;
+                current = grandparent; //set new current to keep fixing tree
             }
+			
             else{ //if uncle is black
                 if(current == parent->getLeft()){ //if current is left child
-                    cout << "rotate tree right" << endl;
                     current = parent; //current is now the PARENT
-                    //cout << "##currentnode is " << current->getData() << endl;
-                    //return rotateTree(head, current, 1); //SEGFAULT
-					rotateTree(head, current, 1);
-					
-					//current = grandparent; //MAYYYYYYYBW
-                    //parent = current->getParent;
+					rotateTree(head, current, 1); //rotate right
                 }
                 //current is right child
-                
-				cout << "rotate tree left grandparent" << endl;
 				
                 int tempColor = parent->getColor();
 				parent->setColor(1);
                 grandparent->setColor(0);
 				current->setColor(0);
 				
+				rotateTree(head, grandparent, 0); //rotate left
 				
-				rotateTree(head, grandparent, 0);
-				
-				
-				return (*(head)); //needs to break out for some reason (???)
+				//return (*(head)); //needs to break out for some reason (???)
             }
         }
         
     }
-	
-	
-	/*if(current->getColor() == 0){
-		if(current == current->getParent()->getLeft()){
-			rotateTree(head, current, 1);
-		}
-		else{
-			rotateTree(head, current, 0);
-		}
-	}*/
-    
     (*head)->setColor(1); //root is always black
     return (*(head)); //ensure correct head
 }
@@ -224,7 +187,6 @@ Node* rotateTree(Node** head, Node* current, int leftright){ //ISSUE IS IN THE R
         
         Node* rightNode = current->getRight(); //current's right child
 		//cout << "rightNode's right COLOR: " << rightNode->getRight()->getColor() << endl;
-        //cout << "hey. i actually got here!" << endl;
         
 		current->setRight(rightNode->getLeft());    
         
@@ -258,8 +220,6 @@ Node* rotateTree(Node** head, Node* current, int leftright){ //ISSUE IS IN THE R
 		
 		//cout << "wow i actually got here!" << endl;
         
-		
-		printTree(*head, 0); //test
     }
     
     
@@ -288,20 +248,13 @@ Node* rotateTree(Node** head, Node* current, int leftright){ //ISSUE IS IN THE R
         leftNode->setRight(current);
         current->setParent(leftNode);
 		
-		
-		//leftNode->setColor(0); //same as left rotate??
-		
-		printTree(*head, 0); //test
+		//printTree(*head, 0); //test
     }
     
     return *head;
 }
  
- 
- 
- 
- 
- 
+
  
 //bool searchTree(Node* ){
     //not now
@@ -341,27 +294,24 @@ int main(){
             //cout << head -> getData() << endl;
         }
         
-        /*else if(strcmp(command, "read") == 0){
+        else if(strcmp(command, "read") == 0){
             cout << "Type the file name (include the .txt extension): ";
             char* filename = new char[100];
             cin.getline(filename, 100);
             
             ifstream inFile; //get file input
             inFile.open(filename);
-            
-            int n = 0;
-            while(inFile >> n){
-            
-                stor[index] = n; //fill stor with file
-                index++;
-            }
-            
-            //fill array?
-            for(int i = 0; i < index; i++){
-                //if(stor[i] == ')
-                //addNode(head, stor[i]);
-            }
-        }*/
+			
+			while(inFile.eof() != true){
+				char* running = new char[3];
+				inFile.getline(running, 4, ',');
+				int input = atoi(running);
+				addNode(&head, head, input); //execute insertion
+			}
+			inFile.close();
+			
+			
+        }
         
         else if(strcmp(command, "print") == 0){ //print rbt
             printTree(head, 0);
