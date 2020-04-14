@@ -11,21 +11,27 @@ Code by Michael Yan
 3/21/2020
 This code creates a Red Black Tree, able to add, search, and print (delete later)
 */
- 
+
+/*
+Credit to Ali Fakhry for suggesting the head be declared outside of main and called using double-astericks to (fix?)
+issue where the wrong head was being printed during printTree
+Note: this issue shouldn't happen, the real cause for this is still not known. This is simply a workaround.
+In addition, this 'fix' may have lead to another issue.
+*/
+
+
 Node* addNode(Node**, Node*, int);
 void printTree(Node*, int);
 Node* fixTree(Node**, Node*);
 Node* rotateTree(Node**, Node*, int);
- 
- 
+
+
 using namespace std;
- 
- 
- 
+
+
+
 Node* addNode(Node** head, Node* parent, int input){ //insert pseudo: https://en.wikipedia.org/wiki/Red%E2%80%93black_tree
     if(parent->getData() == NULL){
-        //cout << "yuh";
-        //head = parent;
         parent->setColor(1);
         parent->setData(input);
     }
@@ -36,7 +42,6 @@ Node* addNode(Node** head, Node* parent, int input){ //insert pseudo: https://en
                 tempNode->setData(input);
                 tempNode->setParent(parent);
                 parent->setLeft(tempNode);
-                //cout << "fixtree input less than parent. ";
                 return ((fixTree(head, tempNode))); //rotate
             }
             else{
@@ -44,13 +49,11 @@ Node* addNode(Node** head, Node* parent, int input){ //insert pseudo: https://en
             }
         }
         else{ //if the input is greater than or equal to the previous
-            //cout << "here. ";
             if(parent->getRight() == NULL){ //if no right child
                 Node* tempNode = new Node();
                 tempNode->setData(input);
                 tempNode->setParent(parent);
                 parent->setRight(tempNode);
-                //cout << "fixtree input greater or equal to parent. ";
                 return ((fixTree(head, tempNode))); //rotate
             }
             else{
@@ -58,8 +61,7 @@ Node* addNode(Node** head, Node* parent, int input){ //insert pseudo: https://en
             }
         }
     }
-    //    head->setColor(0);
-    return (*(head));
+    return (*(head)); //ensure the correct head is returned
 }
  
  
@@ -101,8 +103,6 @@ void printTree(Node* parent, int space){ //sideways tree print algorithm (same a
  
 Node* fixTree(Node** head, Node* current){ //check and fix tree after every insertion
     
-    //Node* parent = NULL;
-    //Node* grandparent = NULL;
     Node* parent = current->getParent(); //declare parent
     Node* grandparent = parent->getParent(); //declare grandparent
     
@@ -113,51 +113,60 @@ Node* fixTree(Node** head, Node* current){ //check and fix tree after every inse
         //Node* grandparent = parent->getParent(); //declare grandparent
         
         if(parent == grandparent->getLeft()){ //if parent is left child
-            Node* uncle = grandparent->getRight();
+		
+            Node* uncle = grandparent->getRight(); //right uncle
             
             if(uncle != NULL && uncle->getColor() == 0){ //if uncle is red
                 parent->setColor(1);
                 uncle->setColor(1);
                 grandparent->setColor(0); //grand parent is red
-                current = grandparent;
+				
+                current = grandparent; //this is not wokring for some reason
+				cout << "current is now: " << current->getData() << endl;
             }
             
             else{ //if uncle is black
                 if(current == parent->getRight()){ //if current is right child
                     cout << "rotate tree left" << endl;
                     current = parent;
-                    cout << "##currentnode is " << current->getData() << endl;
-                    return rotateTree(head, current, 0);    //SEGFAULT
-                    parent = current->getParent(); //parents
+                    //cout << "##currentnode is " << current->getData() << endl;
+                    //return rotateTree(head, current, 0);
+					rotateTree(head, current, 0);
+					
+					
+					//current = grandparent; //MAYYYYYYYBW
+                    //parent = current->getParent(); //parents
                 }
+				
                 //current is left child
                 cout << "rotate tree right grandparent" << endl;
-                rotateTree(head, grandparent, 1); //SEGFAULT
+                
+				
                 int tempColor = parent->getColor();
-                //parent->setColor(1);
-                //grandparent->setColor(0);
                 parent->setColor(grandparent->getColor());
                 grandparent->setColor(tempColor);
-                current = parent;
+				
+                //current = parent;
+				
+				rotateTree(head, grandparent, 1);
+				
+				return (*(head));
             }
-            //uncle = NULL;
-            //delete uncle; //mem
         }
         
         else{ //if parent is right childe
             
-            Node* uncle = grandparent->getLeft();
+            Node* uncle = grandparent->getLeft(); //left uncle
             
             //same as parent left child
             if(uncle != NULL && uncle->getColor() == 0){ //if uncle is red
-                //Node* input = new Node();
-                //input = uncle;
                 
                 parent->setColor(1);
-                //input->setColor(1);
                 uncle->setColor(1);
                 grandparent->setColor(0); //grand parent red
-                current = grandparent;
+				
+                current = grandparent; //why is this not working
+				cout << "current is now: " << current->getData() << endl;
             }
             else{ //if uncle is black
                 if(current == parent->getLeft()){ //if current is left child
@@ -166,68 +175,41 @@ Node* fixTree(Node** head, Node* current){ //check and fix tree after every inse
                     //cout << "##currentnode is " << current->getData() << endl;
                     //return rotateTree(head, current, 1); //SEGFAULT
 					rotateTree(head, current, 1);
+					
+					//current = grandparent; //MAYYYYYYYBW
                     //parent = current->getParent;
                 }
                 //current is right child
-                cout << "rotate tree left grandparent" << endl;
-                  //SEGFAULT
-               // cout << "====================" << endl;
-				
-                //printTree(rotateTree(head, grandparent, 0), 0);
-				
-				//rotateTree(head, grandparent, 0);
-				
-				//cout << "current (rightmost, 3): " << current->getData() << endl;
-				//cout << "current's (rightmost, 3) COLOR: " << current->getColor() << endl;
+                
+				cout << "rotate tree left grandparent" << endl;
 				
                 int tempColor = parent->getColor();
-                //parent->setColor(grandparent->getColor());
-                //grandparent->setColor(tempColor);
 				parent->setColor(1);
                 grandparent->setColor(0);
 				current->setColor(0);
 				
-				//cout << "current (rightmost, 3): " << current->getData() << endl;
-				//cout << "current's (rightmost, 3) COLOR: " << current->getColor() << endl;
 				
 				rotateTree(head, grandparent, 0);
 				
-				//for some reason i need these two lines:
-				/*current->setColor(1);
-				current->getRight()->setColor(0);
-				break;*/
 				
-				
-				//parent->setColor(1);
-				//grandparent->setColor(0);
-				//current->setColor(1);
-				//(*head)->setColor(1);
-				return (*(head)); //needs to break out for some reason
+				return (*(head)); //needs to break out for some reason (???)
             }
-            //uncle = NULL;
-            //delete uncle;
         }
         
     }
-    
-    //cout << "got here" << endl;
-    
-    /*parent = NULL;
-    grandparent = NULL;
-    delete parent;
-    delete grandparent;*/
+	
+	
+	/*if(current->getColor() == 0){
+		if(current == current->getParent()->getLeft()){
+			rotateTree(head, current, 1);
+		}
+		else{
+			rotateTree(head, current, 0);
+		}
+	}*/
     
     (*head)->setColor(1); //root is always black
-    
-	/*cout << "what is the head? it's " << (*head)->getData() << endl;
-    
-    if((*head)->getParent() != NULL){
-        *head = parent;
-    }
-    
-    cout << "what is the head? it's " << (*head)->getData() << endl;*/
-    
-    return (*(head));
+    return (*(head)); //ensure correct head
 }
  
  
@@ -237,14 +219,8 @@ Node* fixTree(Node** head, Node* current){ //check and fix tree after every inse
 Node* rotateTree(Node** head, Node* current, int leftright){ //ISSUE IS IN THE ROTATION FUNCTION
     
     //0 is left, 1 is right
-    if(leftright == 0){ //left rotation       
-	
-		//ERROR WHEN ROTATE LEFT GRANDPARENT, COLORS ARE WRONG??
+    if(leftright == 0){ //left rotation
 		
-		
-        //cout << "did i get here? i did!" << endl;
-        
-        //cout << "##current's right child is " << current->getRight()->getData() << endl;
         
         Node* rightNode = current->getRight(); //current's right child
 		//cout << "rightNode's right COLOR: " << rightNode->getRight()->getColor() << endl;
@@ -257,21 +233,10 @@ Node* rotateTree(Node** head, Node* current, int leftright){ //ISSUE IS IN THE R
         if(rightNode->getLeft() != NULL){
             rightNode->getLeft()->setParent(current);
         }
-        
-        //current->setRight(rightNode->getLeft()); //test
+
         
         rightNode->setParent(current->getParent());
         
-        //printTree(*head, 0);
-		/*cout << "current: " << current->getData() << endl;
-		if(current->getParent() != NULL){
-			cout << "parent: " << current->getParent()->getData() << endl;	
-		}
-        cout << "rightNode: " << rightNode->getData() << endl;
-		cout << "rightNode's right: " << rightNode->getRight()->getData() << endl;
-		cout << "rightNode's right COLOR: " << rightNode->getRight()->getColor() << endl;
-		*/
-		
         
         if(current == (*(head))){
             (*(head)) = rightNode;
@@ -289,8 +254,12 @@ Node* rotateTree(Node** head, Node* current, int leftright){ //ISSUE IS IN THE R
         current->setParent(rightNode);
 		
         //printTree(*head, 0);
-		rightNode->setColor(1); //THIS FIXES IT!!!
+		rightNode->setColor(1); //THIS FIXES IT!!!		//possible cause of new error... when there is a new head, its not getting reset..
+		
+		//cout << "wow i actually got here!" << endl;
         
+		
+		printTree(*head, 0); //test
     }
     
     
@@ -300,7 +269,7 @@ Node* rotateTree(Node** head, Node* current, int leftright){ //ISSUE IS IN THE R
         
         cout << current->getLeft()->getData() << endl;
         
-        current->setLeft(leftNode->getRight());    //SEGFAULT IS THROWN HERE.
+        current->setLeft(leftNode->getRight());
         if(leftNode->getRight() != NULL){
             leftNode->getRight()->setParent(current);
         }
@@ -319,7 +288,10 @@ Node* rotateTree(Node** head, Node* current, int leftright){ //ISSUE IS IN THE R
         leftNode->setRight(current);
         current->setParent(leftNode);
 		
-        //printTree(*head, 0);
+		
+		//leftNode->setColor(0); //same as left rotate??
+		
+		printTree(*head, 0); //test
     }
     
     return *head;
@@ -350,7 +322,7 @@ int main(){
     int *stor = new int[1000];
     
     
-    //Node* head = new Node(); //root
+    //Node* head = new Node(); //declare outside
     
     
     while(true){ //give user action command options
