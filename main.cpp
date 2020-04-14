@@ -103,14 +103,14 @@ void printTree(Node* parent, int space){ //sideways tree print algorithm (same a
  
 Node* fixTree(Node** head, Node* current){ //check and fix tree after every insertion
     
-    Node* parent = current->getParent(); //declare parent
-    Node* grandparent = parent->getParent(); //declare grandparent
+    //Node* parent = current->getParent(); //declare parent
+    //Node* grandparent = parent->getParent(); //declare grandparent
     
     //if current is the root, do nothing
-    while(current != *head && parent != NULL && parent->getColor() == 0){
+    while(current != *head && current->getParent() != NULL && current->getParent()->getColor() == 0){
         
-        //Node* parent = current->getParent(); //declare parent
-        //Node* grandparent = parent->getParent(); //declare grandparent
+        Node* parent = current->getParent(); //declare parent
+        Node* grandparent = parent->getParent(); //declare grandparent
         
         if(parent == grandparent->getLeft()){ //if parent is left child
 		
