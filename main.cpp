@@ -304,7 +304,7 @@ int main(){
 			
 			while(inFile.eof() != true){
 				char* running = new char[3];
-				inFile.getline(running, 4, ',');
+				inFile.getline(running, 4, ' '); //numbers separated by spaces
 				int input = atoi(running);
 				addNode(&head, head, input); //execute insertion
 			}
